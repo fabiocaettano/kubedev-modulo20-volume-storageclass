@@ -11,13 +11,28 @@ spec:
     metadata:       
       labels:
         app: api
-    spec:      
+    spec:
+      initContainers:
+        - name: init-pod
+          image: busybox:1.28
+          command: ["sh","-c"," until nslookup mongo-service.default.svc.cluster.local; do echo Aguardando o Banco de Dados; sleep 2; done"]         
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "100Mi"
+            limits:
+              cpu: "100m"
+              memory: "100Mi"
       containers:
       - name: api
         image: fabiocaettano74/pedelogo-catalogo:v1.0.0
         ports:
         - containerPort: 80
         imagePullPolicy: Always
+        lifecycle:
+          postStart:
+            exec:
+              command: ["sh","-c","echo Pod is Running > pod.txt"]
         livenessProbe:
           httpGet:            
             path: /health
@@ -36,10 +51,10 @@ spec:
           failureThreshold: 3
         resources:
           requests:
-            memory: 50Mi
-            cpu: 50m
+            memory: 256Mi
+            cpu: 100m
           limits:
-            memory: 250Mi
+            memory: 512Mi
             cpu: 250m
         envFrom:
           - configMapRef:

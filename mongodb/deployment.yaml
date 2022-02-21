@@ -25,12 +25,10 @@ spec:
             cpu: 100m
           limits:
             memory: 512Mi
-            cpu: 200m
+            cpu: 250m
         envFrom:
           - secretRef:
-              name: mongodb-secret
-      nodeSelector:
-        disktype: dados
+              name: mongodb-secret      
       volumes:
         - name: mongo-data
           persistentVolumeClaim:
